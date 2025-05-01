@@ -515,4 +515,11 @@ def handle_phone_command(command):
         speak("I'm not sure what you want to do with your phone. You can try commands like 'call someone', 'send a text', or 'open an app'.")
         return True
 
+# the command function for interaction:
+def process_command(command):
+    # Handle phone control commands first
+    if any(phrase in command for phrase in ["phone", "call", "text", "message", "battery"]):
+        if handle_phone_command(command):
+            return True
+
 
