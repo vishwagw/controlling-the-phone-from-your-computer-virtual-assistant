@@ -53,5 +53,22 @@ def speak(text):
     
     print(text)
 
-
-
+# Function to listen to voice input
+def listen():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        recognizer.adjust_for_ambient_noise(source, duration=1)
+        audio = recognizer.listen(source)
+    
+    try:
+        print("Recognizing...")
+        command = recognizer.recognize_google(audio).lower()
+        print(f"You said: {command}")
+        return command
+    except sr.UnknownValueError:
+        speak("Sorry, I didn't understand that.")
+        return ""
+    except sr.RequestError:
+        speak("Sorry, there was an error with the speech recognition service.")
+        return ""
