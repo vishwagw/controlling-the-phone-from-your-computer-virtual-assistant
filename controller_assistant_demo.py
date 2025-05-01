@@ -72,3 +72,17 @@ def listen():
     except sr.RequestError:
         speak("Sorry, there was an error with the speech recognition service.")
         return ""
+
+# Function to greet the user
+def greet_user():
+    current_hour = datetime.datetime.now().hour
+    if current_hour < 12:
+        greeting = "Good morning!"
+    elif 12 <= current_hour < 18:
+        greeting = "Good afternoon!"
+    else:
+        greeting = "Good evening!"
+    
+    speak(greeting)
+    print(greeting)
+
