@@ -358,3 +358,161 @@ class PhoneController:
 # Initialize the phone controller
 phone_controller = PhoneController()
 
+# Function to handle phone control commands
+def handle_phone_command(command):
+    if not phone_controller.connected:
+        speak("Your phone is not connected. Would you like to set it up now?")
+        response = listen().lower()
+        if "yes" in response or "yeah" in response or "sure" in response:
+            if phone_controller.setup_phone():
+                speak("Phone setup complete. What would you like to do with your phone?")
+                new_command = listen()
+                if new_command:
+                    return handle_phone_command(new_command)
+            return True
+        else:
+            speak("OK, phone setup cancelled.")
+            return True
+    
+    # Call commands
+    if "call" in command:
+        # Extract contact name
+        for phrase in ["call", "phone"]:
+            if phrase in command:
+                parts = command.split(phrase)
+                if len(parts) > 1 and parts[1].strip():
+                    contact = parts[1].strip()
+                    phone_controller.make_call(contact)
+                    return True
+        
+        # If contact not found in command
+        speak("Who would you like to call?")
+        contact = listen()
+        if contact:
+            phone_controller.make_call(contact)
+        return True
+    
+    # Text message commands
+    elif "text" in command or "message" in command or "send message" in command:
+        contact = None
+        message = None
+        
+        # Check if the command already has the contact
+        for phrase in ["text", "message to", "send message to"]:
+            if phrase in command:
+                parts = command.split(phrase)
+                if len(parts) > 1:
+                    # Look for "saying" or similar to split contact and message
+                    contact_msg = parts[1].strip()
+                    for separator in ["saying", "that says", "with message", "with text"]:
+                        if separator in contact_msg:
+                            contact_msg_parts = contact_msg.split(separator, 1)
+                            contact = contact_msg_parts[0].strip()
+                            message = contact_msg_parts[1].strip()
+                            break
+                    
+                    # If no separator found, just extract contact
+                    if not message and contact_msg:
+                        contact = contact_msg
+        
+        # If contact not found or incomplete information
+        if not contact:
+            speak("Who would you like to send a message to?")
+            contact = listen()
+        
+        if contact and not message:
+            speak(f"What message would you like to send to {contact}?")
+            message = listen()
+        
+        if contact and message:
+            phone_controller.send_text(contact, message)
+        return True
+    
+    # Open app commands
+    elif "open" in command and ("app" in command or "application" in command):
+        app_name = None
+        
+        for phrase in ["open app", "open application", "launch app"]:
+            if phrase in command:
+                parts = command.split(phrase)
+                if len(parts) > 1 and parts[1].strip():
+                    app_name = parts[1].strip()
+                    break
+        
+        if not app_name:
+            speak("Which app would you like to open on your phone?")
+            app_name = listen()
+            
+        if app_name:
+            phone_controller.open_app(app_name)
+        return True
+    
+    # Take a photo
+    elif "take photo" in command or "take picture" in command or "take a photo" in command or "take a picture" in command:
+        phone_controller.take_photo()
+        return True
+    
+    # Set an alarm
+    elif "set alarm" in command or "set an alarm" in command:
+        time_str = None
+        
+        for phrase in ["set alarm", "set an alarm", "wake me up"]:
+            if phrase in command:
+                parts = command.split(phrase)
+                if len(parts) > 1 and parts[1].strip():
+                    time_str = parts[1].strip()
+                    break
+        
+        if not time_str:
+            speak("What time would you like to set the alarm for?")
+            time_str = listen()
+            
+        if time_str:
+            phone_controller.set_alarm(time_str)
+        return True
+    
+    # Check battery
+    elif "battery" in command or "charge" in command:
+        phone_controller.check_battery()
+        return True
+    
+    # Find phone
+    elif "find phone" in command or "find my phone" in command or "locate phone" in command or "where is my phone" in command:
+        phone_controller.find_phone()
+        return True
+    
+    # Toggle Do Not Disturb
+    elif "do not disturb" in command or "silent mode" in command or "silence phone" in command:
+        phone_controller.toggle_do_not_disturb()
+        return True
+    
+    # Check notifications
+    elif "notification" in command or "messages" in command:
+        phone_controller.get_notifications()
+        return True
+    
+    # Help with phone commands
+    elif "phone help" in command or "what can you do with my phone" in command:
+        speak("I can help you control your phone with commands like:")
+        speak("Call a contact, send a text message, open an app, take a photo,")
+        speak("set an alarm, check battery level, find your phone,")
+        speak("toggle do not disturb mode, or check your notifications.")
+        return True
+    
+    # Disconnect phone
+    elif "disconnect phone" in command or "unpair phone" in command:
+        speak("Are you sure you want to disconnect your phone?")
+        confirm = listen().lower()
+        if "yes" in confirm or "yeah" in confirm:
+            phone_controller.connected = False
+            speak("Phone disconnected. You can reconnect it anytime.")
+        else:
+            speak("Phone disconnect cancelled.")
+        return True
+    
+    # If no specific phone command matched
+    else:
+        speak("I'm not sure what you want to do with your phone. You can try commands like 'call someone', 'send a text', or 'open an app'.")
+        return True
+
+
