@@ -21,3 +21,37 @@ import time
 import requests
 import json
 import threading
+
+# Function for speaking with gTTS
+def speak(text):
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
+        temp_filename = fp.name
+    
+    # Generate speech
+    tts = gTTS(text=text, lang='en', slow=False)
+    tts.save(temp_filename)
+    
+    # Initialize pygame mixer
+    pygame.mixer.init()
+    pygame.mixer.music.load(temp_filename)
+    pygame.mixer.music.play()
+    
+    # Wait for the audio to finish playing
+    while pygame.mixer.music.get_busy():
+        pygame.time.Clock().tick(10)
+    
+    # Clean up
+    pygame.mixer.music.stop()
+    pygame.mixer.quit()
+    
+    # Remove temporary file
+    try:
+        os.unlink(temp_filename)
+    except:
+        pass
+    
+    print(text)
+
+
+
