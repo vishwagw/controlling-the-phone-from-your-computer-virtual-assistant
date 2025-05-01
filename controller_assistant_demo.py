@@ -522,4 +522,21 @@ def process_command(command):
         if handle_phone_command(command):
             return True
 
+# Main loop
+def virtual_assistant():
+    greet_user()
+    speak("I am Trinity, your virtual assistant. How can I help you?")
+    
+    # Check if phone is already configured
+    if phone_controller.connected:
+        speak("Your phone is connected and ready for commands.")
+    
+    running = True
+    
+    while running:
+        command = listen()
+        if command:
+            running = process_command(command)
 
+if __name__ == "__main__":
+    virtual_assistant()
