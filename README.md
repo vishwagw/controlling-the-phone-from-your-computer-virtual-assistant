@@ -25,3 +25,9 @@ This application is a modification of basic codebase of trinity.
 * Take photos: "Take a photo with my phone"
 * Set alarms: "Set an alarm for 7 AM on my phone"
 * Check battery level: "Check my phone battery"
+
+4. There are 3 different applications in This repository.
+* Using custom mobile server
+* Using pybluez PYthon Library
+* Using bleak Python library
+
